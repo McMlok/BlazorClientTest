@@ -1,0 +1,30 @@
+﻿@using GrpcGreeter;
+@using Grpc.Net.Client;
+@using Grpc.Net.Client.Web;
+@page "/"
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+<p>Current geatings: @greetings</p>
+
+<button class="btn btn-primary" @onclick="GetGreetings">Click me</button>
+
+@code {
+    private string greetings = String.Empty;
+
+    private async void GetGreetings()
+    {
+        var channel = GrpcChannel.ForAddress("https://localhost:5001", new GrpcChannelOptions
+        {
+            HttpHandler = new GrpcWebHandler(new HttpClientHandler())
+        });
+
+        var client = new Greeter.GreeterClient(channel);
+        var response = await client.SayHelloAsync(new HelloRequest { Name = ".NET" });
+        greetings = response.Message;
+    }
+}
